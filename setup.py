@@ -10,8 +10,8 @@ config = {
     'download_url': 'https://github.com/MikaelBertze/HomeEnergyConsumptionTracker',
     'author_email': 'mikael@bertze.com',
     'version': '0.1',
-    'install_requires': ['nose'],
-    'packages': ['Sensors'],
+    'install_requires': ['nose', 'numpy', 'pause', 'requests'],
+    'packages': ['sensors'],
     'scripts': [],
     'name': 'HomeEnergyConsumptionTracker',
     'license' : ''

@@ -1,4 +1,4 @@
-from Sensor import Sensor
+from sensor import Sensor
 
 class ElectricityTickSensor(Sensor):
     """Electricity tick sensor"""
@@ -13,6 +13,10 @@ class ElectricityTickSensor(Sensor):
         """
         super(ElectricityTickSensor, self).__init__(sensorId, 'ElectricityTickSensor', 'Watt')
         self.__ticksPerKWh = ticksPerKWh
+
+    def ticksPerKwh(self):
+        """Ticks per kWh"""
+        return self.__ticksPerKWh
 
     def addValueWithTimeSpan(self, timeSpan):
         """Add value using a timeSpan."""
