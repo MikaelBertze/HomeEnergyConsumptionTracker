@@ -4,6 +4,13 @@ class Sensor(object):
     """Sensor base class"""
     
     def __init__(self, sensorId, sensorType, sensorUnit):
+        """ Constructor
+        Parameters
+        ----------
+        sensorId : int
+        sensorType : string
+        sensorUnit : string
+        """
         self.__sensorId = sensorId
         self.__sensorType = sensorType
         self.__sensorUnit = sensorUnit
@@ -15,8 +22,13 @@ class Sensor(object):
 
     def addValue(self, value, time = None):
         """Add a sensor value
-        value - sensor value
-        time - value read time. If None, time at function call is used"""
+        Parameters
+        ----------
+        value : int
+                sensor value in the sensor specific unit
+        time  : datetime, optional
+                value read time. If not provide, time at function call is used
+        """
         time = time if time != None else datetime.now()
         self.__values.append((time, value))
 
