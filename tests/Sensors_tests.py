@@ -13,6 +13,14 @@ def test_sensorId():
     sensor = Sensor(12, "testSensor", "Q")
     assert sensor.sensorId() == 12, "wrong id"
 
+def test_peakDataMessage():
+    sensor = Sensor(12, "testSensor", "Q")
+    sensor.addValue(1)
+    
+    assert sensor.peakDataMessage()['value'] == 1, "Wrong message got peaked?"
+    assert sensor.peakDataMessage()['value'] == 1, "Should be possible to peak multiple times"
+    assert sensor.popDataMessage()['value'] == 1, "Wrong message got popped?"
+    assert sensor.peakDataMessage() == None, "Should return none when list is empty"
 
 def test_popDataMessage():
     sensor = Sensor(12, "testSensor", "Q")
