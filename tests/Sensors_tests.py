@@ -1,6 +1,5 @@
 from nose.tools import *
-from sensors.sensor import Sensor
-from sensors.electricitysensors import ElectricityTickSensor
+from homesensors.sensor import Sensor
 from datetime import datetime
 
 

@@ -11,7 +11,7 @@ config = {
     'author_email': 'mikael@bertze.com',
     'version': '0.1',
     'install_requires': ['nose', 'numpy', 'pause', 'requests'],
-    'packages': ['sensors'],
+    'packages': ['homesensors'],
     'scripts': [],
     'name': 'HomeEnergyConsumptionTracker',
     'license' : ''

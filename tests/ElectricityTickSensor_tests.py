@@ -1,5 +1,5 @@
 from nose.tools import *
-from sensors.electricitysensors import ElectricityTickSensor
+from homesensors.electricitysensors import ElectricityTickSensor
 
 def setup():
     print "ElectricityTickSensor - Tests"
