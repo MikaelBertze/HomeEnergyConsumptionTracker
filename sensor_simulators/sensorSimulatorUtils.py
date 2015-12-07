@@ -58,7 +58,7 @@ def real_time_electricity_data(sensor, mean, span, period, sendSpan):
         delta = data[i]
         t += delta
         pause.until(t)
-        w = sensor.convertToWatt(delta)
+        w = sensor.convert_to_watt(delta)
         print "Current load: " + str(w)
         sensor.add_value(w)
 

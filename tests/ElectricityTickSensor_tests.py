@@ -9,5 +9,5 @@ def teardown():
 
 def test_ticksPerKwh():
     sensor = ElectricityTickSensor(12, 1000)
-    assert sensor.ticksPerKwh() == 1000, "unexpected ticks per kWh"
+    assert sensor.ticks_per_kWh() == 1000, "unexpected ticks per kWh"
     
