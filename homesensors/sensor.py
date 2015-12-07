@@ -60,10 +60,3 @@ class Sensor(object):
                     'value' : int(value[1]),
                     'time' : value[0].strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                }
-
-    
-
-
-
-
-
