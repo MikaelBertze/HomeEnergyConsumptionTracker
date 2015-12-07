@@ -21,7 +21,7 @@ class Sensor(object):
         """Gets the sensor Id for this sensor"""
         return self.__sensorId
 
-    def add_value(self, value, time = None):
+    def add_value(self, value, time=None):
         """Add a sensor value
         Parameters
         ----------
@@ -30,7 +30,7 @@ class Sensor(object):
         time  : datetime, optional
                 value read time. If not provide, time at function call is used
         """
-        time = time if time != None else datetime.now()
+        time = time if time is not None else datetime.now()
         self.__values.append((time, value))
 
     def can_pop_message(self):
@@ -55,8 +55,8 @@ class Sensor(object):
     def __build_data_message(self, value):
         assert len(value) == 2, "unexpected value lenght."
         return {
-                    'sensorType' : self.__sensorType,
-                    'sensorUnit' : self.__sensorUnit,
-                    'value' : int(value[1]),
-                    'time' : value[0].strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                    'sensorType': self.__sensorType,
+                    'sensorUnit': self.__sensorUnit,
+                    'value': int(value[1]),
+                    'time': value[0].strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                }

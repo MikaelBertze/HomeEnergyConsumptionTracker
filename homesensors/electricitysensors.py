@@ -11,8 +11,10 @@ class ElectricityTickSensor(Sensor):
 
         Parameters
         ----------
-        sensor_id (int) : sensor ID
-        ticks_per_kWh (float): ticks per kWh
+        sensor_id : int
+                    sensor ID
+        ticks_per_kWh : float
+                        ticks per kWh
         """
         super(ElectricityTickSensor, self).__init__(sensor_id, 'ElectricityTickSensor', 'Watt')
         self.__ticksPerKWh = ticks_per_kWh
@@ -26,7 +28,8 @@ class ElectricityTickSensor(Sensor):
 
         Parameters
         ----------
-        time_span : time span in seconds
+        time_span : float
+                    time span in seconds
         """
         self.add_value(self.convert_to_watt(time_span))
 
@@ -34,7 +37,8 @@ class ElectricityTickSensor(Sensor):
         """Convert a timeSpan to Watts
         Parameters
         ----------
-        time_span : time span in seconds
+        time_span : float
+                    time span in seconds
         """
         wh_per_hit = 1 / float(self.__ticksPerKWh) * 1000
         return wh_per_hit * 3600/float(time_span)
