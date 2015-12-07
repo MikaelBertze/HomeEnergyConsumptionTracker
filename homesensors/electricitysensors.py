@@ -6,12 +6,12 @@ class ElectricityTickSensor(Sensor):
     __ticksPerKWh = -1
 
 
-    def __init__(self, sensorId, ticksPerKWh):
+    def __init__(self, sensor_id, ticksPerKWh):
         """Constructor
         sensorId - sensor id (int)
         ticksPerKWh - number of ticks per kWh
         """
-        super(ElectricityTickSensor, self).__init__(sensorId, 'ElectricityTickSensor', 'Watt')
+        super(ElectricityTickSensor, self).__init__(sensor_id, 'ElectricityTickSensor', 'Watt')
         self.__ticksPerKWh = ticksPerKWh
 
     def ticksPerKwh(self):
@@ -20,7 +20,7 @@ class ElectricityTickSensor(Sensor):
 
     def addValueWithTimeSpan(self, timeSpan):
         """Add value using a timeSpan."""
-        self.addValue(self.convertToWatt(timeSpan))
+        self.add_value(self.convertToWatt(timeSpan))
 
     def convertToWatt(self, timeSpan):
         """Convert a timeSpan to Watts

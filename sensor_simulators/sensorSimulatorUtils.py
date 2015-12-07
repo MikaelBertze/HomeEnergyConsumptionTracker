@@ -15,12 +15,12 @@ def build_add_data_message(data):
 
 def send_test_data(sensor):
     stop = False
-    while stop is False and sensor.canPopMessage():
-        message = sensor.peakDataMessage()
+    while stop is False and sensor.can_pop_message():
+        message = sensor.peak_data_message()
         data = build_add_data_message(message)
-        stop = not webutils.sendMessage(data, sensor.sensorId())
+        stop = not webutils.sendMessage(data, sensor.sensor_id())
         if not stop:
-            sensor.popDataMessage()
+            sensor.pop_data_message()
 
 
 def get_sin_index(t, span, len):
@@ -60,7 +60,7 @@ def real_time_electricity_data(sensor, mean, span, period, sendSpan):
         pause.until(t)
         w = sensor.convertToWatt(delta)
         print "Current load: " + str(w)
-        sensor.addValue(w)
+        sensor.add_value(w)
 
         if time() - last_send >= sendSpan:
             send_test_data(sensor)

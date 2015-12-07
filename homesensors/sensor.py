@@ -1,26 +1,27 @@
 from datetime import datetime
 
+
 class Sensor(object):
     """Sensor base class"""
     
-    def __init__(self, sensorId, sensorType, sensorUnit):
+    def __init__(self, sensor_id, sensor_type, sensor_unit):
         """ Constructor
         Parameters
         ----------
-        sensorId : int
-        sensorType : string
-        sensorUnit : string
+        sensor_id : int
+        sensor_type : string
+        sensor_unit : string
         """
-        self.__sensorId = sensorId
-        self.__sensorType = sensorType
-        self.__sensorUnit = sensorUnit
+        self.__sensorId = sensor_id
+        self.__sensorType = sensor_type
+        self.__sensorUnit = sensor_unit
         self.__values = []
 
-    def sensorId(self):
+    def sensor_id(self):
         """Gets the sensor Id for this sensor"""
         return self.__sensorId
 
-    def addValue(self, value, time = None):
+    def add_value(self, value, time = None):
         """Add a sensor value
         Parameters
         ----------
@@ -32,27 +33,26 @@ class Sensor(object):
         time = time if time != None else datetime.now()
         self.__values.append((time, value))
 
-    def canPopMessage(self):
+    def can_pop_message(self):
         return len(self.__values) > 0
 
-    def peakDataMessage(self):
+    def peak_data_message(self):
         """Build the sensor message for one value
         The reported value will not be removed from the internal list of values
         """
         if len(self.__values) == 0:
             return None
-        return self.__buildDataMessage(self.__values[0])
+        return self.__build_data_message(self.__values[0])
 
-
-    def popDataMessage(self):
+    def pop_data_message(self):
         """Build the sensor message for one value
         The reported value will be removed from the internal list of values
         """
         if len(self.__values) == 0:
             return None
-        return self.__buildDataMessage(self.__values.pop(0))
+        return self.__build_data_message(self.__values.pop(0))
 
-    def __buildDataMessage(self, value):
+    def __build_data_message(self, value):
         assert len(value) == 2, "unexpected value lenght."
         return {
                     'sensorType' : self.__sensorType,
