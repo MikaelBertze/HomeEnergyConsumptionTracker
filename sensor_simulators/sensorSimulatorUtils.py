@@ -17,8 +17,7 @@ def send_test_data(sensor):
     stop = False
     while stop is False and sensor.can_pop_message():
         message = sensor.peak_data_message()
-        data = build_add_data_message(message)
-        stop = not webutils.send_message(data, sensor.sensor_id())
+        stop = not webutils.send_message(message, sensor.sensor_id())
         if not stop:
             sensor.pop_data_message()
 
