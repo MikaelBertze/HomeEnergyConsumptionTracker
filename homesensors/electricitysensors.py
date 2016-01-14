@@ -33,6 +33,15 @@ class ElectricityTickSensor(Sensor):
         """
         self.add_value(self.convert_to_watt(time_span))
 
+    def convert_to_time(self, power):
+        """Convert a Watts to a timeSpan
+        Parameters
+        ----------
+        power : float
+                    power in watt
+        """
+        return 3600000.0 / self.__ticksPerKWh / power
+
     def convert_to_watt(self, time_span):
         """Convert a timeSpan to Watts
         Parameters
