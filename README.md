@@ -17,9 +17,9 @@ For this project, a simple detector was built:
 [schema]
 
 ##### Ananlog Electricity Meeter Sensor hardware
-My house got an old analog meeter connected to the heating system. This meeter require a different type of sensor that detects a black section on a spinning metal disk. The black mark is marked on the outsisde of a approximatly 2mm thick disk with a diameter of ~ 15cm. The meter will spin the disk 120 laps per consumed kWh. 
+My house got an old analog meter connected to the heating system. This meter require a different type of sensor that detects a black section on a spinning metal disk. The black mark is marked on the outside of a approximately 2 mm thick disk with a diameter of ~ 15cm. The meter will spin the disk 120 laps per consumed kWh.
 
-A light source is aimed at the disk such that a reflection is created that hits the sensor.  The meeter is inverted in the sence that it will detect liTo create  with the main difference beeing that the analog sensor provide it's own light source.
+A light source is aimed at the disk such that a reflection is created that hits the sensor. The black mark will break the reflection, which is detected by the sensor. 
 
 
 ##### Temperature Sensor
