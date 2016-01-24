@@ -27,10 +27,11 @@ def send_message(message, sensor_id):
     message
     sensor_id"""
 
-    payload = {"data": json.dumps(message)}
-    __debug(payload)
+    __debug(url)
+    __debug(json.dumps(message))
+
     try:
-        r = requests.post(url + str(sensor_id), data=payload)
+        requests.post(url + str(sensor_id), data=message)
         return True
     except:
         __debug("WebService is down...")

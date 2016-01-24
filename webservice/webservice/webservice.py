@@ -37,15 +37,11 @@ def current_load_get(sensor_id):
 @route('/v1/currentLoad/<sensor_id:int>', method='POST')
 def current_load_post(sensor_id):
     debug("currentLoadPost")
-    pay_load = request.forms.get('data')
-    debug("Sonsor: " + str(sensor_id))
-    debug("Payload: " + pay_load)
-    pay_load = json.loads(pay_load)
-    
-    sensor_value = pay_load["value"]
-    date_time_str = pay_load["time"]
-    sensor_type = pay_load["sensorType"]
+    sensor_value = request.forms.get("value")
+    date_time_str = request.forms.get("time")
+    sensor_type = request.forms.get("sensorType")
     date_time= datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S.%f')
+    debug([sensor_id, sensor_type, sensor_value, date_time])
     deliveryService.current_load_delivery(sensor_id, sensor_type, sensor_value, date_time)
 
 
