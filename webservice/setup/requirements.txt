@@ -1,0 +1,6 @@
+### Project requirements ###
+numpy
+requests
+bottle
+MySQL-python
+scipy
