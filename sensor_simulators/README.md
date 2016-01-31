@@ -4,7 +4,7 @@ To simplify the development of sensor consumers, like the web service, virtual s
 
 Installation
 ----------------
-1. Install the homesensors modules (see HomeEnergyConsumptionTracker/homesensors .
+1. Install the homesensor modules (see HomeEnergyConsumptionTracker/homesensors .
 2. pip install -r setup/requirements.txt
 
 Running the electricity sensor
