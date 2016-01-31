@@ -24,10 +24,10 @@ def current_load_get(sensor_id):
     current_load = measurements.get_current_load(sensor_id)
 
     result = {
-               'sensor_id': sensor_id,
-               'current_load': current_load['sensor_value'],
-               'sensor_type': current_load['sensor_type'],
-               'sensor_unit': current_load['sensor_unit']
+               'sensorId': sensor_id,
+               'currentLoad': current_load['sensor_value'],
+               'sensorType': current_load['sensor_type'],
+               'sensorUnit': current_load['sensor_unit']
              }
 
     print result
@@ -37,6 +37,8 @@ def current_load_get(sensor_id):
 @route('/v1/currentLoad/<sensor_id:int>', method='POST')
 def current_load_post(sensor_id):
     debug("currentLoadPost")
+
+    
     sensor_value = request.forms.get("value")
     date_time_str = request.forms.get("time")
     sensor_type = request.forms.get("sensorType")
