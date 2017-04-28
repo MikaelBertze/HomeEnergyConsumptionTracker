@@ -35,7 +35,7 @@ Output Parameters
 ----------------------
 
 Parameter | Type | Description |
----|---|---|--:|
+---|---|--:|
 sensorId | Int | Sensor ID |
 currentLoad | Int | Latest reported load |
 sensorType | String | Type of sensor |
