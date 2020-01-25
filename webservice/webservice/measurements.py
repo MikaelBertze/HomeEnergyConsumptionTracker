@@ -3,7 +3,7 @@ import databaseUtils as db_utils
 
 def get_current_load(sensor_id):
     query = __get_current_load_query(sensor_id)
-    print query
+    print(query)
     result = db_utils.query_for_data(query)
     return {
             'sensor_value': result[0][1],
@@ -20,7 +20,7 @@ def __get_current_load_query(sensor_id):
 
 
 def __get_unit_for_sensor(sensor_type):
-    conversions = {'ElectricityTickSensor': 'Watt'}
+    conversions = {'ElectricitySensor': 'Watt'}
     if type in conversions.keys():
         return conversions[sensor_type]
     return "Undefined"

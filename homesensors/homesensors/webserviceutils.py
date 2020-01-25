@@ -40,4 +40,4 @@ def send_message(message, sensor_id):
 
 def __debug(message):
     if DEBUG:
-        print "webserviceutils: " + str(message)
+        print("webserviceutils: " + str(message))

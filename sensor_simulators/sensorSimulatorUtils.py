@@ -61,15 +61,15 @@ def real_time_electricity_simulator(sensor, curve, period, send_span):
     send_span - time span in seconds between send to web service
     """
 
-    print "Starting simulator"
-    print "------------------------------"
-    print "Type: Electricity Tick Sensor"
-    print "Max: %f sec" % max(curve)
-    print "Min: %f sec" % min(curve)
-    print "Period: %i sec" % period
-    print "Send Interval: %i" % send_span
-    print "-----------------------------"
-    print
+    print("Starting simulator")
+    print("------------------------------")
+    print("Type: Electricity Tick Sensor")
+    print("Max: %f sec" % max(curve))
+    print("Min: %f sec" % min(curve))
+    print("Period: %i sec" % period)
+    print("Send Interval: %i" % send_span)
+    print("-----------------------------")
+    print()
 
     t = time()
     last_send= t
@@ -79,8 +79,8 @@ def real_time_electricity_simulator(sensor, curve, period, send_span):
         diff = sensor.convert_to_time(power)
         t += diff
         pause.until(t)
-        print "tick time: " + str(diff)
-        print "Current load: " + str(power)
+        print("tick time: " + str(diff))
+        print("Current load: " + str(power))
         sensor.add_value(power)
 
         if time() - last_send >= send_span:

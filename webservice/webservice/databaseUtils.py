@@ -1,4 +1,6 @@
-import MySQLdb
+
+import pymysql
+
 from scipy.interpolate import interp1d
 from scipy import arange, array, exp
 
@@ -9,7 +11,7 @@ databaseDb = ""
 
 
 def connect():
-    return MySQLdb.connect(user=databaseUser, passwd=databasePass,db=databaseDb)
+    return pymysql.connect(user=databaseUser, passwd=databasePass,db=databaseDb)
 
 
 def insert_many(query, data):
@@ -20,7 +22,7 @@ def insert_many(query, data):
         db.commit()
         db.close()
     except Exception as e:
-        print "SQL error: " + e.message
+        print("SQL error: " + e.message)
 
 
 def query_for_data(query):
@@ -33,7 +35,7 @@ def query_for_data(query):
         db.commit()
         db.close()
     except:
-        print "SQL error"
+        print("SQL error")
     return rows
 
 

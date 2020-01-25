@@ -1,13 +1,13 @@
 from bottle import route, run, template, request
 import databaseUtils
 import json
-import ConfigParser
+import configparser
 import measurements
 import deliveryService
 from datetime import datetime
 
 
-config = ConfigParser.RawConfigParser()
+config = configparser.RawConfigParser()
 config.read('webservice.cfg')
 
 port = config.getint("Site", "port")
@@ -30,7 +30,7 @@ def current_load_get(sensor_id):
                'sensorUnit': current_load['sensor_unit']
              }
 
-    print result
+    print(result)
     return json.dumps(result)
 
 
@@ -62,7 +62,7 @@ def consumption(sensor_id):
 
 def debug(message):
   if DEBUG:
-    print message
+    print(message)
 
 debug("debug") 
 run(host='localhost', port=4000)

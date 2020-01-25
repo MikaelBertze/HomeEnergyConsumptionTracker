@@ -10,7 +10,7 @@ config = {
     'download_url': 'https://github.com/MikaelBertze/HomeEnergyConsumptionTracker/webservice',
     'author_email': 'mikael@bertze.com',
     'version': '0.1',
-    'install_requires': ['numpy', 'bottle', 'MySQL-python', 'scipy'],
+    'install_requires': ['numpy', 'bottle', 'scipy'],
     'packages': [],
     'scripts': [],
     'name': 'HomeEnergyConsumptionTracker_WebService',
