@@ -1,4 +1,4 @@
-from sensor import Sensor
+from homesensors.sensor import Sensor
 
 
 class ElectricityTickSensor(Sensor):
@@ -16,7 +16,7 @@ class ElectricityTickSensor(Sensor):
         ticks_per_kWh : float
                         ticks per kWh
         """
-        super(ElectricityTickSensor, self).__init__(sensor_id, 'ElectricityTickSensor', 'Watt')
+        super(ElectricityTickSensor, self).__init__(sensor_id, 'ElectricitySensor', 'Watt')
         self.__ticksPerKWh = ticks_per_kWh
 
     def ticks_per_kWh(self):
