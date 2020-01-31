@@ -27,15 +27,18 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     try:
         print(msg.topic+" "+str(msg.payload))
-        s = msg.payload.decode('ascii')
-        key, value = (x.strip() for x in s.split(':'))
-        if key == 'tickPeriod':
-            v = int(value)
-            wh_per_hit = 1 / float(1000) * 1000
-            power = wh_per_hit * 3600/float(v/1000)
-            print(power)
-            sensor.add_value(power)
-            send_data(sensor)
+        recieved = msg.payload.decode('ascii')
+        tps, cs = recieved.split('|')
+
+        for s in [tps, cs]:
+            key, value = (x.strip() for x in s.split(':'))
+            if key == 'tickPeriod':
+                v = int(value)
+                wh_per_hit = 1 / float(1000) * 1000
+                power = wh_per_hit * 3600/float(v/1000)
+                print(power)
+                sensor.add_value(power)
+                send_data(sensor)
     except Exception as ex:
         print(ex)
         
