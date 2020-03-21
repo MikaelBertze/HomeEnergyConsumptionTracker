@@ -1,0 +1,15 @@
+2020-03-21 18:31:44.127 | INFO     | __main__:<module>:22 - Starting up!
+2020-03-21 18:31:44.129 | INFO     | __main__:<module>:24 - Configuration: {'fullscreen': 'NO'}
+2020-03-21 18:31:44.130 | INFO     | controlpanel.updaters:run:17 - Starting MQTT updater thread
+2020-03-21 18:31:44.130 | INFO     | controlpanel.updaters:run:65 - Fetching weather data...
+2020-03-21 18:31:44.507 | INFO     | controlpanel.updaters:run:67 - Fetching weather status: 200
+2020-03-21 18:31:44.614 | INFO     | controlpanel.updaters:on_connect:26 - Connected with result code  0
+2020-03-21 18:32:35.553 | INFO     | __main__:<module>:22 - Starting up!
+2020-03-21 18:32:35.553 | INFO     | __main__:<module>:24 - Configuration: {'fullscreen': 'NO'}
+2020-03-21 18:32:35.554 | INFO     | controlpanel.updaters:run:17 - Starting MQTT updater thread
+2020-03-21 18:32:35.554 | INFO     | controlpanel.updaters:run:65 - Fetching weather data...
+2020-03-21 18:32:35.828 | INFO     | controlpanel.frames:next_frame:49 - Frame switch: 0
+2020-03-21 18:32:35.849 | INFO     | controlpanel.updaters:on_connect:26 - Connected with result code  0
+2020-03-21 18:32:35.861 | INFO     | controlpanel.updaters:run:67 - Fetching weather status: 200
+2020-03-21 18:32:44.801 | INFO     | controlpanel.frames:next_frame:49 - Frame switch: 1
+2020-03-21 18:32:45.297 | INFO     | controlpanel.frames:next_frame:49 - Frame switch: 2
