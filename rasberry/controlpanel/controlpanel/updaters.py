@@ -5,59 +5,112 @@ import paho.mqtt.client as mqtt
 import requests
 from loguru import logger
 from datetime import datetime, timedelta
+import numpy as np
 import time
+
+from rx.subject import Subject
+
+
+class Updater:
+
+    def __init__(self):
+        self.temp_updater = TemperatureUpdater()
+        self.power_updater = PowerUpdater()
+        self.weather_updater = WeatherUpdater()
+
+    def start(self):
+        self.temp_updater.start()
+        self.power_updater.start()
+        self.weather_updater.start()
+
 
 class MqttUpdater(threading.Thread):
 
-    def __init__(self, subject):
-        self.subject = subject
+    def __init__(self, server, topic, on_message):
         threading.Thread.__init__(self)
+        self._server = server
+        self._topic = topic
+        self._on_message = on_message
 
     def run(self):
         logger.info("Starting MQTT updater thread")
-        client = mqtt.Client(userdata = self)
+        client = mqtt.Client(userdata=self)
         client.on_connect = MqttUpdater.on_connect
-        client.on_message = MqttUpdater.on_message
-        client.connect("broker.hivemq.com", 1883, 60)
+        client.on_message = self._on_message
+        client.connect(self._server, 1883, 60)
         client.loop_forever()
 
     @staticmethod
     def on_connect(client, userdata, flags, rc):
+        logger.info("HEJ!")
         logger.info("Connected with result code  " +str(rc))
-        # Subscribing in on_connect() means that if we lose the connection and
-        # reconnect then subscriptions will be renewed.
-        client.subscribe("/megatron/electricityTicker")
-        client.subscribe("/megatron/temperature")
+        logger.info(userdata._topic)
+        client.subscribe(userdata._topic)
+
+class PowerUpdater(MqttUpdater):
+    def __init__(self):
+        MqttUpdater.__init__(self, "broker.hivemq.com", "/megatron/electricityTicker", PowerUpdater.on_message)
+        self.whenPowerReported = Subject()
+        self.whenHourUsageReported = Subject()
+        self.currentHourUsage = []
 
     @staticmethod
     def on_message(client, userdata, msg):
         try:
-            recieved = msg.payload.decode('ascii')
+            received = msg.payload.decode('ascii')
+            tps, cs = received.split('|')
 
-            if msg.topic == "/megatron/electricityTicker":
-                tps, cs = recieved.split('|')
+            for s in [tps, cs]:
 
-                for s in [tps, cs]:
-                    key, value = (x.strip() for x in s.split(':'))
-                    if key == 'tickPeriod':
-                        v = int(value)
-                        wh_per_hit = 1 / float(1000) * 1000
-                        power = wh_per_hit * 3600 / float(v / 1000)
-                        userdata.subject.on_next(('power', f"{str(int(power))}W"))
+                key, value = (x.strip() for x in s.split(':'))
+                if key == 'tickPeriod':
+                    v = int(value)
+                    wh_per_hit = 1 / float(1000) * 1000
+                    power = wh_per_hit * 3600 / float(v / 1000)
 
-            if msg.topic == "/megatron/temperature":
-                key, value = (x.strip() for x in recieved.split(':'))
-                if key == 'temp':
-                    userdata.subject.on_next(('temp', f"{value}°C"))
+                    userdata.whenPowerReported.on_next(power)
+
+                    # hourly usage
+                    now = datetime.now()
+                    delta = timedelta(minutes=now.minute, seconds=now.second, microseconds=now.microsecond)
+                    if len(userdata.currentHourUsage) > 0 and userdata.currentHourUsage[-1][0] > delta.total_seconds():
+                        logger.info("new hour!")
+                        userdata.currentHourUsage = []
+                    userdata.currentHourUsage.append((delta.total_seconds(), power))
+                    values = [x[1] / 1000 for x in userdata.currentHourUsage]
+                    times = [x[0] / 60 / 60 for x in userdata.currentHourUsage]
+                    currentHourUsage = np.trapz(values, times)
+
+                    userdata.whenHourUsageReported.on_next(currentHourUsage)
+
+        except Exception as ex:
+            logger.error("Exception in mqtt thread: " + str(ex))
+
+
+class TemperatureUpdater(MqttUpdater):
+    def __init__(self):
+        MqttUpdater.__init__(self, "broker.hivemq.com", "/megatron/temperature", TemperatureUpdater.on_message)
+        self.whenTemperatureReported = Subject()
+
+    @staticmethod
+    def on_message(client, userdata, msg):
+        try:
+            logger.info("message!")
+            received = msg.payload.decode('ascii')
+            logger.info(received)
+            key, value = (x.strip() for x in received.split(':'))
+            if key == 'temp':
+                userdata.whenTemperatureReported.on_next(float(value))
 
         except Exception as ex:
             logger.error("Exception in mqtt thread: " + str(ex))
 
 
 class WeatherUpdater(threading.Thread):
-    def __init__(self, update_subject):
-        self.update_subject = update_subject
+    def __init__(self):
         threading.Thread.__init__(self)
+        self.when_weather_updated = Subject()
+
 
     def run(self):
         while True:
@@ -84,7 +137,8 @@ class WeatherUpdater(threading.Thread):
                     r = [f"{d[0].day}/{d[0].month}", max(temperatures), min(temperatures)]
                     r_data.append(r)
 
-                self.update_subject.on_next(("weather", (datetime.now(), r_data)))
+                self.when_weather_updated.on_next(("weather", (datetime.now(), r_data)))
+
             except Exception as ex:
                 logger.error("Exception in weather thread: " + str(ex))
                 logger.info(data)

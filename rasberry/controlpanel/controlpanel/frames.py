@@ -6,7 +6,7 @@ from tkinter import Frame, StringVar, CENTER, Label, Tk, PhotoImage, Button, E, 
 from loguru import logger
 
 class MainApp(Tk):
-    def __init__(self, updater_subject):
+    def __init__(self, updater):
         Tk.__init__(self)
 
         self.left_img = PhotoImage(
@@ -30,9 +30,9 @@ class MainApp(Tk):
 
         self.frames = []
 
-        for F in [Frame1, WeatherFrame, IsItFridayFrame]: #, HouseMapFrame]:
+        for F in [Frame1, WeatherFrame, IsItFridayFrame]: #, SensorsFrame]: #, HouseMapFrame]:
             page_name = F.__name__
-            frame = F(parent=container, updater_subject=updater_subject)
+            frame = F(parent=container, updater=updater)
             self.frames.append(frame)
 
             # put all of the pages in the same location;
@@ -63,24 +63,29 @@ class MainApp(Tk):
 
 
 class ControlPanelFrame(Frame):
-    def __init__(self, parent, updater_subject):
+    def __init__(self, parent, updater):
         Frame.__init__(self, parent)
-        self.updater_subject = updater_subject
+        self.updater = updater
 
     def on_show(self):
         pass
 
 
 class Frame1(ControlPanelFrame):
-    def __init__(self, parent, updater_subject):
-        ControlPanelFrame.__init__(self, parent, updater_subject)
+    def __init__(self, parent, updater):
+        ControlPanelFrame.__init__(self, parent, updater)
         self.initUI()
         #self.mq_thread = MqttUpdater(self.the_queue)
         #self.mq_thread.start()
         #self.refresh_data()
         self.time = None
         self.tick()
-        self.updater_subject.subscribe(lambda x: self.refresh_data(x))
+        self.updater.power_updater.whenPowerReported.subscribe(
+            lambda x: self.powerValue.set("{:.0f}W".format(x)))
+        self.updater.temp_updater.whenTemperatureReported.subscribe(
+            lambda x: self.tempValue.set("{:.1f}°C".format(x)))
+        self.updater.power_updater.whenHourUsageReported.subscribe(
+            lambda x: self.curHourValue.set("{:.2f}kWh".format(x)))
 
     def tick(self):
         # get the current local time from the PC
@@ -98,18 +103,23 @@ class Frame1(ControlPanelFrame):
         self.config(bg="#333")
         self.clockValue = StringVar()
         self.clockValue.set('---')
-        self.clock_label = Label(self, textvariable=self.clockValue, bg="#333", fg="#fff", font=("Courier", 80, "bold"))
+        self.clock_label = Label(self, textvariable=self.clockValue, bg="#333", fg="#fff", font=("Courier", 50, "bold"))
         self.clock_label.place(relx=0.5, rely=0.1, anchor=CENTER)
 
         self.powerValue = StringVar()
         self.powerValue.set('---')
-        power_label = Label(self, textvariable=self.powerValue, bg="#333", fg="#fff", font=("Courier", 100, "bold"))
-        power_label.place(relx=0.5, rely=0.4, anchor=CENTER)
+        power_label = Label(self, textvariable=self.powerValue, bg="#333", fg="#fff", font=("Courier", 80, "bold"))
+        power_label.place(relx=0.5, rely=0.35, anchor=CENTER)
+
+        self.curHourValue = StringVar()
+        self.curHourValue.set('---')
+        curHour_label = Label(self, textvariable=self.curHourValue, bg="#333", fg="#fff", font=("Courier", 50, "bold"))
+        curHour_label.place(relx=0.5, rely=0.55, anchor=CENTER)
 
         self.tempValue = StringVar()
         self.tempValue.set('---')
-        temp_label = Label(self, textvariable=self.tempValue, bg="#333", fg="#fff", font=("Courier", 100, "bold"))
-        temp_label.place(relx=0.5, rely=0.7, anchor=CENTER)
+        temp_label = Label(self, textvariable=self.tempValue, bg="#333", fg="#fff", font=("Courier", 80, "bold"))
+        temp_label.place(relx=0.5, rely=0.8, anchor=CENTER)
 
     def refresh_data(self, data):
         """
@@ -125,11 +135,11 @@ class Frame1(ControlPanelFrame):
 
 
 class WeatherFrame(ControlPanelFrame):
-    def __init__(self, parent, updater_subject):
-        ControlPanelFrame.__init__(self, parent, updater_subject)
+    def __init__(self, parent, updater):
+        ControlPanelFrame.__init__(self, parent, updater)
         self.data = []
         self.initUI()
-        self.updater_subject.subscribe(lambda x: self.refresh_data(x))
+        updater.weather_updater.when_weather_updated.subscribe(lambda x: self.refresh_data(x))
 
     def on_show(self):
         pass
@@ -182,8 +192,8 @@ class WeatherFrame(ControlPanelFrame):
 
 
 class IsItFridayFrame(ControlPanelFrame):
-    def __init__(self, parent, updater_subject):
-        ControlPanelFrame.__init__(self, parent, updater_subject)
+    def __init__(self, parent, updater):
+        ControlPanelFrame.__init__(self, parent, updater)
         self.fredag = StringVar()
         self.fredag.set("Är det fredag?")
         self.initUI()
@@ -207,3 +217,22 @@ class IsItFridayFrame(ControlPanelFrame):
     def on_show(self):
         self.fredag.set("Är det fredag?")
         self.after(5 * 1000, self.visa_svar)  # called only once!
+
+
+class SensorsFrame(ControlPanelFrame):
+    def __init__(self, parent, updater):
+        ControlPanelFrame.__init__(self, parent, updater)
+        self.initUI()
+        #updater.subscribe(lambda x: self.update(x))
+
+    def initUI(self):
+        self.config(bg="#333")
+
+        font1 = ("Courier", 30, "bold")
+        font2 = ("Courier", 20, "bold")
+
+        #header = Label(self, textvariable=self.fredag, bg="#333", fg="#fff", font=font)
+        #header.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+    def update(self, message):
+        pass
