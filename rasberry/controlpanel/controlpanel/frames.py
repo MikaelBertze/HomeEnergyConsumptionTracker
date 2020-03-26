@@ -103,22 +103,22 @@ class Frame1(ControlPanelFrame):
         self.config(bg="#333")
         self.clockValue = StringVar()
         self.clockValue.set('---')
-        self.clock_label = Label(self, textvariable=self.clockValue, bg="#333", fg="#fff", font=("Courier", 50, "bold"))
+        self.clock_label = Label(self, textvariable=self.clockValue, bg="#333", fg="#fff", font=("Courier", 60, "bold"))
         self.clock_label.place(relx=0.5, rely=0.1, anchor=CENTER)
 
         self.powerValue = StringVar()
         self.powerValue.set('---')
-        power_label = Label(self, textvariable=self.powerValue, bg="#333", fg="#fff", font=("Courier", 70, "bold"))
+        power_label = Label(self, textvariable=self.powerValue, bg="#333", fg="#fff", font=("Courier", 90, "bold"))
         power_label.place(relx=0.5, rely=0.35, anchor=CENTER)
 
         self.curHourValue = StringVar()
         self.curHourValue.set('---')
-        curHour_label = Label(self, textvariable=self.curHourValue, bg="#333", fg="#fff", font=("Courier", 35, "bold"))
+        curHour_label = Label(self, textvariable=self.curHourValue, bg="#333", fg="#fff", font=("Courier", 60, "bold"))
         curHour_label.place(relx=0.5, rely=0.55, anchor=CENTER)
 
         self.tempValue = StringVar()
         self.tempValue.set('---')
-        temp_label = Label(self, textvariable=self.tempValue, bg="#333", fg="#fff", font=("Courier", 70, "bold"))
+        temp_label = Label(self, textvariable=self.tempValue, bg="#333", fg="#fff", font=("Courier", 90, "bold"))
         temp_label.place(relx=0.5, rely=0.85, anchor=CENTER)
 
     def refresh_data(self, data):
