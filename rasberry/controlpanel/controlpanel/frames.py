@@ -108,18 +108,18 @@ class Frame1(ControlPanelFrame):
 
         self.powerValue = StringVar()
         self.powerValue.set('---')
-        power_label = Label(self, textvariable=self.powerValue, bg="#333", fg="#fff", font=("Courier", 50, "bold"))
+        power_label = Label(self, textvariable=self.powerValue, bg="#333", fg="#fff", font=("Courier", 70, "bold"))
         power_label.place(relx=0.5, rely=0.35, anchor=CENTER)
 
         self.curHourValue = StringVar()
         self.curHourValue.set('---')
-        curHour_label = Label(self, textvariable=self.curHourValue, bg="#333", fg="#fff", font=("Courier", 30, "bold"))
+        curHour_label = Label(self, textvariable=self.curHourValue, bg="#333", fg="#fff", font=("Courier", 35, "bold"))
         curHour_label.place(relx=0.5, rely=0.55, anchor=CENTER)
 
         self.tempValue = StringVar()
         self.tempValue.set('---')
-        temp_label = Label(self, textvariable=self.tempValue, bg="#333", fg="#fff", font=("Courier", 50, "bold"))
-        temp_label.place(relx=0.5, rely=0.8, anchor=CENTER)
+        temp_label = Label(self, textvariable=self.tempValue, bg="#333", fg="#fff", font=("Courier", 70, "bold"))
+        temp_label.place(relx=0.5, rely=0.85, anchor=CENTER)
 
     def refresh_data(self, data):
         """
