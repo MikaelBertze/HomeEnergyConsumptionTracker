@@ -15,5 +15,5 @@ if __name__ == '__main__':
         logger.info("Setting full screen mode")
         app.attributes("-fullscreen", True)
 
-    app.geometry("480x320")
+    app.geometry("720x480")
     app.mainloop()
