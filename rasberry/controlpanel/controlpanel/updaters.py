@@ -49,7 +49,7 @@ class MqttUpdater(threading.Thread):
 
 class PowerUpdater(MqttUpdater):
     def __init__(self):
-        MqttUpdater.__init__(self, "broker.hivemq.com", "/megatron/electricityTicker", PowerUpdater.on_message)
+        MqttUpdater.__init__(self, "broker.hivemq.com", "/megatron/electricityticker/tickperiod", PowerUpdater.on_message)
         self.whenPowerReported = Subject()
         self.whenHourUsageReported = Subject()
         self.currentHourUsage = []
