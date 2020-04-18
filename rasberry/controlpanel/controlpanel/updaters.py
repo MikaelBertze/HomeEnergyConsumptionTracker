@@ -7,7 +7,7 @@ from loguru import logger
 from datetime import datetime, timedelta
 import numpy as np
 import time
-
+from threading import Timer
 from rx.subject import Subject
 
 
@@ -49,14 +49,30 @@ class MqttUpdater(threading.Thread):
 
 class PowerUpdater(MqttUpdater):
     def __init__(self):
-        MqttUpdater.__init__(self, "broker.hivemq.com", "/megatron/electricityticker/tickperiod", PowerUpdater.on_message)
+        MqttUpdater.__init__(self, "192.168.1.150", "/megatron/electricityticker/tickperiod", PowerUpdater.on_message)
+        self.lost_count = 0
         self.whenPowerReported = Subject()
         self.whenHourUsageReported = Subject()
+        self.whenNoPowerReported = Subject()
         self.currentHourUsage = []
+        self.watchdog = Timer(10.0, self.timeout)
+        self.watchdog.start()
+
+
+    def timeout(self):
+        self.lost_count += 1
+        self.whenNoPowerReported.on_next(self.lost_count)
+        self.restart_watchdog()
+
+    def restart_watchdog(self):
+        self.watchdog.cancel()
+        self.watchdog = Timer(10.0, self.timeout)
+        self.watchdog.start()
 
     @staticmethod
     def on_message(client, userdata, msg):
         try:
+            userdata.restart_watchdog()
             received = msg.payload.decode('ascii')
             tps, cs = received.split('|')
 
@@ -89,7 +105,7 @@ class PowerUpdater(MqttUpdater):
 
 class TemperatureUpdater(MqttUpdater):
     def __init__(self):
-        MqttUpdater.__init__(self, "broker.hivemq.com", "/megatron/temperature", TemperatureUpdater.on_message)
+        MqttUpdater.__init__(self, "192.168.1.150", "/megatron/temperature", TemperatureUpdater.on_message)
         self.whenTemperatureReported = Subject()
 
     @staticmethod
