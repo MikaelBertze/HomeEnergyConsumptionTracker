@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import time
 from datetime import datetime
-from tkinter import Frame, StringVar, CENTER, Label, Tk, PhotoImage, Button, E, W
+
+from tkinter import Frame, StringVar, CENTER, Label, Tk, PhotoImage, Button, E, W, N, S, NE, NW, Canvas
 
 from loguru import logger
 
@@ -81,11 +82,21 @@ class Frame1(ControlPanelFrame):
         self.time = None
         self.tick()
         self.updater.power_updater.whenPowerReported.subscribe(
-            lambda x: self.powerValue.set("{:.0f}W".format(x)))
+            lambda x: self.power_report(x))
         self.updater.temp_updater.whenTemperatureReported.subscribe(
             lambda x: self.tempValue.set("{:.1f}°C".format(x)))
         self.updater.power_updater.whenHourUsageReported.subscribe(
             lambda x: self.curHourValue.set("{:.2f}kWh".format(x)))
+        self.updater.power_updater.whenNoPowerReported.subscribe(
+            lambda x: self.no_reporting())
+
+    def no_reporting(self):
+        self.powerValue.set("????")
+        self.myCanvas.itemconfig(self.oval, fill="red")
+
+    def power_report(self, x):
+        self.powerValue.set("{:.0f}W".format(x))
+        self.myCanvas.itemconfig(self.oval, fill="green")
 
     def tick(self):
         # get the current local time from the PC
@@ -101,6 +112,11 @@ class Frame1(ControlPanelFrame):
 
     def initUI(self):
         self.config(bg="#333")
+
+        self.myCanvas = Canvas(self, width=20, height=20, bg="#333", bd=0, highlightthickness=0)
+        self.oval = self.myCanvas.create_oval(0, 0, 20, 20, fill="yellow")
+        self.myCanvas.place(relx=1, rely=0.05, anchor=NE)
+
         self.clockValue = StringVar()
         self.clockValue.set('---')
         self.clock_label = Label(self, textvariable=self.clockValue, bg="#333", fg="#fff", font=("Courier", 60, "bold"))
@@ -120,18 +136,6 @@ class Frame1(ControlPanelFrame):
         self.tempValue.set('---')
         temp_label = Label(self, textvariable=self.tempValue, bg="#333", fg="#fff", font=("Courier", 90, "bold"))
         temp_label.place(relx=0.5, rely=0.85, anchor=CENTER)
-
-    def refresh_data(self, data):
-        """
-        """
-        try:
-            key, data = data
-            if key == 'power':
-                self.powerValue.set(data)
-            if key == 'temp':
-                self.tempValue.set(data)
-        except:
-            pass
 
 
 class WeatherFrame(ControlPanelFrame):
