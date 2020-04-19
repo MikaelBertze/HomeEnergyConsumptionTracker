@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import time
-from datetime import datetime
-
+from datetime import datetime, timedelta
 from tkinter import Frame, StringVar, CENTER, Label, Tk, PhotoImage, Button, E, W, N, S, NE, NW, Canvas
-
 from loguru import logger
+
+from controlpanel import sound_player
 
 class MainApp(Tk):
     def __init__(self, updater):
@@ -31,7 +31,7 @@ class MainApp(Tk):
 
         self.frames = []
 
-        for F in [Frame1, WeatherFrame, IsItFridayFrame]: #, SensorsFrame]: #, HouseMapFrame]:
+        for F in [TimersFrame, Frame1, WeatherFrame, IsItFridayFrame]: #, SensorsFrame]: #, HouseMapFrame]:
             page_name = F.__name__
             frame = F(parent=container, updater=updater)
             self.frames.append(frame)
@@ -240,3 +240,103 @@ class SensorsFrame(ControlPanelFrame):
 
     def update(self, message):
         pass
+
+class TimerWidget(Frame):
+
+    font1 = ("Courier", 40, "bold")
+
+    def __init__(self, parent, name, minutes, seconds):
+        Frame.__init__(self, parent)
+        self.config(bg="#333")
+
+        self.start_time = None
+
+        self.name = name
+        self.minutes = minutes
+        self.seconds = seconds
+        self.mode = "reset"
+        self.text = StringVar()
+        self.alarm_toggle = False
+        self.button = Button(self,
+                             textvariable=self.text,
+                             bg="#333",
+                             fg="#fff",
+                             activebackground='#333',
+                             highlightthickness=1,
+                             bd=0,
+                             font=TimerWidget.font1,
+                             command=lambda: self.toggle())
+        self.button.pack(padx=20, pady=20)
+
+        self.reset()
+
+    def reset(self):
+        self.mode = "reset"
+        self.start_time = None
+        self.text.set(f"{self.name} ({self.minutes}:{self.seconds})")
+
+    def start(self):
+        self.mode = "running"
+        self.start_time = time.time()
+        self.tick()
+
+    def toggle(self):
+        logger.info("toggle")
+        if self.mode == "reset":
+            self.start()
+        elif self.mode == "running":
+            self.reset()
+
+
+        logger.info(self.mode)
+
+    def alarm(self):
+        logger.info("ALARM!")
+        if self.mode == "running":
+            sound_player.alarm()
+            #self.config(bg='red' if self.alarm_toggle else 'blue')
+            #self.alarm_toggle = not self.alarm_toggle
+            #self.after(500, self.alarm)
+        else:
+            self.config(bg="#333")
+
+
+    def tick(self):
+        logger.info("tick")
+        logger.info(self.mode)
+        if self.mode == "reset":
+            return
+        # get the current local time from the PC
+        timeleft = self.start_time + 60*self.minutes + self.seconds - time.time()
+
+        logger.info(timeleft)
+        if timeleft <= 0:
+            self.alarm()
+            return
+        minutes = int(timeleft/60)
+        sec = int(timeleft - minutes * 60)
+        self.text.set(f"{minutes}:{sec}")
+
+        # calls itself every 200 milliseconds
+        # to update the time display as needed
+        # could use >200 ms, but display gets jerky
+        self.after(200, self.tick)
+
+class TimersFrame(ControlPanelFrame):
+    def __init__(self, parent, updater):
+        ControlPanelFrame.__init__(self, parent, updater)
+        self.initUI()
+
+    def initUI(self):
+        self.config(bg="#333")
+
+        TimerWidget(self, "Koka ägg", 0, 5).pack()
+
+
+        #Button(self, textvariable=self.egg_counter, bg="#333", fg="#fff", activebackground='#333', highlightthickness=1, bd=0, font=font1,
+        #       command=lambda: self.next_frame(False)).pack()
+
+
+        #header = Label(self, textvariable=self.fredag, bg="#333", fg="#fff", font=font)
+        #header.place(relx=0.5, rely=0.5, anchor=CENTER)
+
