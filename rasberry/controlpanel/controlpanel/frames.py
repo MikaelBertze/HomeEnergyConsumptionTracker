@@ -334,6 +334,7 @@ class TimersFrame(ControlPanelFrame):
         self.config(bg="#333")
 
         TimerWidget(self, "Koka ägg", "Ägg", 6, 45).pack()
+        TimerWidget(self, "Åsa", "Älskar dig", 0, 10).pack()
 
 
         #Button(self, textvariable=self.egg_counter, bg="#333", fg="#fff", activebackground='#333', highlightthickness=1, bd=0, font=font1,
