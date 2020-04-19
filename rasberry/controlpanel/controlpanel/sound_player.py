@@ -1,9 +1,13 @@
 try:
-    import RPi.GPIO as GPIO
-    import time
-    initialized = True
+	buzzer_pin = 4
+	import RPi.GPIO as GPIO
+	GPIO.setmode(GPIO.BCM)
+	GPIO.setup(buzzer_pin, GPIO.IN)
+	GPIO.setup(buzzer_pin, GPIO.OUT)
+	import time
+	initialized = True
 except:
-    initialized = False
+	initialized = False
 
 buzzer_pin = 4
 
