@@ -31,7 +31,7 @@ class MainApp(Tk):
 
         self.frames = []
 
-        for F in [TimersFrame, Frame1, WeatherFrame, IsItFridayFrame]: #, SensorsFrame]: #, HouseMapFrame]:
+        for F in [Frame1, TimersFrame, WeatherFrame, IsItFridayFrame]: #, SensorsFrame]: #, HouseMapFrame]:
             page_name = F.__name__
             frame = F(parent=container, updater=updater)
             self.frames.append(frame)
@@ -245,13 +245,14 @@ class TimerWidget(Frame):
 
     font1 = ("Courier", 40, "bold")
 
-    def __init__(self, parent, name, minutes, seconds):
+    def __init__(self, parent, name, run_name, minutes, seconds):
         Frame.__init__(self, parent)
         self.config(bg="#333")
 
         self.start_time = None
         self.alarm_process :Process= None
         self.name = name
+        self.run_name = run_name
         self.minutes = minutes
         self.seconds = seconds
         self.mode = "reset"
@@ -265,8 +266,9 @@ class TimerWidget(Frame):
                              highlightthickness=1,
                              bd=0,
                              font=TimerWidget.font1,
-                             command=lambda: self.toggle())
-        self.button.pack(padx=20, pady=20)
+                             command=lambda: self.toggle(),
+                             pady=50)
+        self.button.pack(padx=20, pady=40)
 
         self.reset()
 
@@ -298,12 +300,6 @@ class TimerWidget(Frame):
         if self.mode == "running":
             self.alarm_process = Process(target=sound_player.alarm)
             self.alarm_process.start()
-
-
-            #sound_player.alarm()
-            #self.config(bg='red' if self.alarm_toggle else 'blue')
-            #self.alarm_toggle = not self.alarm_toggle
-            #self.after(500, self.alarm)
         else:
             self.config(bg="#333")
 
@@ -322,7 +318,7 @@ class TimerWidget(Frame):
             return
         minutes = int(timeleft/60)
         sec = int(timeleft - minutes * 60)
-        self.text.set(f"{minutes}:{sec}")
+        self.text.set(f"{self.run_name} ({minutes}:{sec})")
 
         # calls itself every 200 milliseconds
         # to update the time display as needed
@@ -337,7 +333,7 @@ class TimersFrame(ControlPanelFrame):
     def initUI(self):
         self.config(bg="#333")
 
-        TimerWidget(self, "Koka ägg", 0, 5).pack()
+        TimerWidget(self, "Koka ägg", "Ägg", 6, 45).pack()
 
 
         #Button(self, textvariable=self.egg_counter, bg="#333", fg="#fff", activebackground='#333', highlightthickness=1, bd=0, font=font1,
