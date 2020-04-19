@@ -300,7 +300,7 @@ class TimerWidget(Frame):
             self.alarm_process.start()
 
 
-            sound_player.alarm()
+            #sound_player.alarm()
             #self.config(bg='red' if self.alarm_toggle else 'blue')
             #self.alarm_toggle = not self.alarm_toggle
             #self.after(500, self.alarm)
