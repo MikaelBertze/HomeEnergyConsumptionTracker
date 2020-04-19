@@ -3,7 +3,7 @@ import time
 from datetime import datetime, timedelta
 from tkinter import Frame, StringVar, CENTER, Label, Tk, PhotoImage, Button, E, W, N, S, NE, NW, Canvas
 from loguru import logger
-
+from multiprocessing import Process
 from controlpanel import sound_player
 
 class MainApp(Tk):
@@ -250,7 +250,7 @@ class TimerWidget(Frame):
         self.config(bg="#333")
 
         self.start_time = None
-
+        self.alarm_process :Process= None
         self.name = name
         self.minutes = minutes
         self.seconds = seconds
@@ -275,6 +275,9 @@ class TimerWidget(Frame):
         self.start_time = None
         self.text.set(f"{self.name} ({self.minutes}:{self.seconds})")
 
+        if self.alarm_process != None and self.alarm_process.is_alive()
+            self.alarm_process.kill()
+
     def start(self):
         self.mode = "running"
         self.start_time = time.time()
@@ -293,6 +296,10 @@ class TimerWidget(Frame):
     def alarm(self):
         logger.info("ALARM!")
         if self.mode == "running":
+            self.alarm_process = Process(traget= sound_player.alarm)
+            self.alarm_process.start()
+
+
             sound_player.alarm()
             #self.config(bg='red' if self.alarm_toggle else 'blue')
             #self.alarm_toggle = not self.alarm_toggle
