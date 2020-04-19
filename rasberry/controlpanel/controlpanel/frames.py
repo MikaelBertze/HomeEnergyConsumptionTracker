@@ -268,13 +268,15 @@ class TimerWidget(Frame):
                              command=lambda: self.toggle(),
                              pady=30,
                              highlightthickness=0, bd=0)
-        self.button.pack()
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.button.grid(column=0,row=0, sticky='nesw')
 
         self.reset()
 
     def reset(self):
         self.mode = "reset"
-        self.config(bg="#333")
+        #self.config(bg="#333")
         self.button.config(bg="#333", activebackground='#333')
 
         self.start_time = None
@@ -287,6 +289,7 @@ class TimerWidget(Frame):
         self.mode = "running"
         self.start_time = time.time()
         self.tick()
+        self.button.config(bg="#335", activebackground='#335')
 
     def toggle(self):
         logger.info("toggle")
@@ -332,16 +335,10 @@ class TimersFrame(ControlPanelFrame):
 
     def initUI(self):
         self.config(bg="#333")
-
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
         TimerWidget(self, "Koka ägg", "Ägg", 6, 45).grid(column=0,row=0, sticky='nesw')
         TimerWidget(self, "Baka bröd", "Bakar", 10, 0).grid(column=0,row=1, sticky='nesw')
         TimerWidget(self, "Penne", "Penne", 11, 0).grid(column=0,row=2, sticky='nesw')
-        TimerWidget(self, "Spagetti", "Spagetti", 8, 0).grid(column=0, row=3, sticky='nesw')
-
-        #Button(self, textvariable=self.egg_counter, bg="#333", fg="#fff", activebackground='#333', highlightthickness=1, bd=0, font=font1,
-        #       command=lambda: self.next_frame(False)).pack()
-
-
-        #header = Label(self, textvariable=self.fredag, bg="#333", fg="#fff", font=font)
-        #header.place(relx=0.5, rely=0.5, anchor=CENTER)
+        TimerWidget(self, "Spagetti", "Spagetti", 0, 3).grid(column=0, row=3, sticky='nesw')
 
