@@ -340,5 +340,5 @@ class TimersFrame(ControlPanelFrame):
         TimerWidget(self, "Koka ägg", "Ägg", 6, 45).grid(column=0,row=0, sticky='nesw')
         TimerWidget(self, "Baka bröd", "Bakar", 10, 0).grid(column=0,row=1, sticky='nesw')
         TimerWidget(self, "Penne", "Penne", 11, 0).grid(column=0,row=2, sticky='nesw')
-        TimerWidget(self, "Spagetti", "Spagetti", 0, 3).grid(column=0, row=3, sticky='nesw')
+        TimerWidget(self, "Åsa", "Åsa", 45, 0).grid(column=0, row=3, sticky='nesw')
 
