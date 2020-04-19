@@ -275,7 +275,7 @@ class TimerWidget(Frame):
         self.start_time = None
         self.text.set(f"{self.name} ({self.minutes}:{self.seconds})")
 
-        if self.alarm_process != None and self.alarm_process.is_alive()
+        if self.alarm_process != None and self.alarm_process.is_alive():
             self.alarm_process.kill()
 
     def start(self):
@@ -296,7 +296,7 @@ class TimerWidget(Frame):
     def alarm(self):
         logger.info("ALARM!")
         if self.mode == "running":
-            self.alarm_process = Process(traget= sound_player.alarm)
+            self.alarm_process = Process(target=sound_player.alarm)
             self.alarm_process.start()
 
 
