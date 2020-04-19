@@ -250,7 +250,7 @@ class TimerWidget(Frame):
         self.config(bg="#333")
 
         self.start_time = None
-        self.alarm_process :Process= None
+        self.alarm_process: Process = None
         self.name = name
         self.run_name = run_name
         self.minutes = minutes
@@ -263,19 +263,22 @@ class TimerWidget(Frame):
                              bg="#333",
                              fg="#fff",
                              activebackground='#333',
-                             highlightthickness=1,
-                             bd=0,
+                             activeforeground='#fff',
                              font=TimerWidget.font1,
                              command=lambda: self.toggle(),
-                             pady=50)
-        self.button.pack(padx=20, pady=40)
+                             pady=30,
+                             highlightthickness=0, bd=0)
+        self.button.pack()
 
         self.reset()
 
     def reset(self):
         self.mode = "reset"
+        self.config(bg="#333")
+        self.button.config(bg="#333", activebackground='#333')
+
         self.start_time = None
-        self.text.set(f"{self.name} ({self.minutes}:{self.seconds})")
+        self.text.set(f"{self.name} ({self.minutes:02}:{self.seconds:02})")
 
         if self.alarm_process != None and self.alarm_process.is_alive():
             self.alarm_process.kill()
@@ -296,29 +299,26 @@ class TimerWidget(Frame):
         logger.info(self.mode)
 
     def alarm(self):
-        logger.info("ALARM!")
-        if self.mode == "running":
+        if self.mode == "running" and (self.alarm_process is None or not self.alarm_process.is_alive()):
+            logger.info("Starting alarm sound")
             self.alarm_process = Process(target=sound_player.alarm)
             self.alarm_process.start()
-        else:
-            self.config(bg="#333")
+            self.button.config(bg="#f33", activebackground='#f33')
+
 
 
     def tick(self):
-        logger.info("tick")
-        logger.info(self.mode)
         if self.mode == "reset":
             return
         # get the current local time from the PC
         timeleft = self.start_time + 60*self.minutes + self.seconds - time.time()
 
-        logger.info(timeleft)
         if timeleft <= 0:
             self.alarm()
-            return
+
         minutes = int(timeleft/60)
         sec = int(timeleft - minutes * 60)
-        self.text.set(f"{self.run_name} ({minutes}:{sec})")
+        self.text.set(f"{self.run_name} ({abs(minutes):02}:{abs(sec):02})")
 
         # calls itself every 200 milliseconds
         # to update the time display as needed
@@ -333,9 +333,10 @@ class TimersFrame(ControlPanelFrame):
     def initUI(self):
         self.config(bg="#333")
 
-        TimerWidget(self, "Koka ägg", "Ägg", 6, 45).pack()
-        TimerWidget(self, "Åsa", "Älskar dig", 0, 10).pack()
-
+        TimerWidget(self, "Koka ägg", "Ägg", 6, 45).grid(column=0,row=0, sticky='nesw')
+        TimerWidget(self, "Baka bröd", "Bakar", 10, 0).grid(column=0,row=1, sticky='nesw')
+        TimerWidget(self, "Penne", "Penne", 11, 0).grid(column=0,row=2, sticky='nesw')
+        TimerWidget(self, "Spagetti", "Spagetti", 8, 0).grid(column=0, row=3, sticky='nesw')
 
         #Button(self, textvariable=self.egg_counter, bg="#333", fg="#fff", activebackground='#333', highlightthickness=1, bd=0, font=font1,
         #       command=lambda: self.next_frame(False)).pack()

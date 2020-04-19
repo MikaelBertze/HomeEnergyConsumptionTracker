@@ -1,10 +1,11 @@
+import time
+
 try:
 	buzzer_pin = 4
 	import RPi.GPIO as GPIO
 	GPIO.setmode(GPIO.BCM)
 	GPIO.setup(buzzer_pin, GPIO.IN)
 	GPIO.setup(buzzer_pin, GPIO.OUT)
-	import time
 	initialized = True
 except:
 	initialized = False
@@ -178,4 +179,7 @@ def play(melody, tempo, pause, pace=0.800):
 def alarm():
 	if initialized:
 		play(popcorn_melody, popcorn_tempo, 0.50, 1.000)
+	else:
+		print("sleeping...")
+		time.sleep(5)
 
