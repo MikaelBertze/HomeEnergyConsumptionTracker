@@ -19,10 +19,12 @@ class MainApp(Tk):
         self.config(bg="#333")
 
         Button(self, bg="#333", fg="#333", activebackground='#333', image=self.left_img, highlightthickness=0, bd=0,
-               command=lambda: self.next_frame(False)).pack(side="left", fill="y", padx=10)
+               padx=50,
+               command=lambda: self.next_frame(False)).pack(side="left", fill="y")
 
         Button(self, bg="#333", fg="#333", activebackground='#333', image=self.right_img,  highlightthickness=0, bd=0,
-               command=lambda: self.next_frame(True)).pack(side="right", fill="y", padx=10)
+               padx=50,
+               command=lambda: self.next_frame(True)).pack(side="right", fill="y")
 
         container = Frame(self)
         container.pack(side="top", fill="both", expand=True)
