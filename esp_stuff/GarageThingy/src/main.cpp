@@ -1,6 +1,9 @@
+#include "wifi-credentials.h"
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
+#include <ESP8266mDNS.h>  
+#include <ArduinoOTA.h>
 #include <ledcontrol.h>
 #include <tempreporter.h>
 #include <doorreporter.h>
@@ -11,8 +14,6 @@ volatile long lastDebounceTime = 0;
 volatile long lastTick = -1;
 
 const char* mqtt_server = "192.168.1.150";
-const char* temp_topic = "/megatron_test/temperature";
-const char* door_topic = "/megatron_test/door";
 const char* mqtt_garage_id = "garageThingy1";
 const char* mqtt_temp_id = "garageThingy_temp";
 const char* mqtt_door_id = "garageThingy_door";
@@ -21,17 +22,10 @@ const char* mqtt_power_id = "garageThingy_power";
 
 ESP8266WiFiMulti WiFiMulti;
 
-//WiFiClient client1;
-//WiFiClient client2;
-//MqttReporter tempMqttReporter(mqtt_server, temp_topic, mqtt_temp_id, &client1); 
-//MqttReporter garageMqttReporter(mqtt_server, door_topic, mqtt_garage_id, &client2); 
+TempReporter tempReporter(D1, String(ESP.getChipId())+ "_1", { mqtt_server, "/megatron/temperature", mqtt_temp_id});
+DoorReporter doorReporter(D6, String(ESP.getChipId())+ "_2", { mqtt_server, "/megatron/door", mqtt_door_id});
+PowerReporter powerReporter(D5, String(ESP.getChipId()) + "_3", { mqtt_server, "/megatron/power", mqtt_power_id});
 
-mqttConfig config = { mqtt_server, temp_topic, mqtt_temp_id};
-
-//TempReporter tempReporter(D1, config, &client1);
-TempReporter tempReporter(D1, String(ESP.getChipId())+ "_1", { mqtt_server, temp_topic, mqtt_temp_id});
-DoorReporter doorReporter(D6, String(ESP.getChipId())+ "_2", { mqtt_server, temp_topic, mqtt_door_id});
-PowerReporter powerReporter(D5, String(ESP.getChipId()) + "_3", { mqtt_server, temp_topic, mqtt_power_id});
 long tempReportLastSend = 0;
 long doorReportLastSend = 0;
 long powerReportLastSend = 0;
@@ -61,14 +55,16 @@ void handleInterrupt() {
 }
 
 void verifyWifi() {
+
+  uint32_t test = 15000;
   if (WiFiMulti.run() == WL_CONNECTED)
     return;
   
   Serial.print("No connection...");
   LedControl::SetRed(true);
-  byte num_retries = 5;
+  byte num_retries = 60;
   byte retries = 0;
-  while (WiFiMulti.run() != WL_CONNECTED) { // Wait for the Wi-Fi to connect: scan for Wi-Fi networks, and connect to the strongest of the networks above
+  while (WiFiMulti.run(15000) != WL_CONNECTED) { // Wait for the Wi-Fi to connect: scan for Wi-Fi networks, and connect to the strongest of the networks above
     delay(1000);
     LedControl::ToggleBlue();
     if(retries++ > num_retries){
@@ -84,18 +80,19 @@ void verifyWifi() {
   Serial.println(WiFi.macAddress());
   Serial.print("ChipID: ");
   Serial.println(ESP.getChipId());
-
   LedControl::SetRed(false);
 }
 
 void setup() {
   LedControl::InitLeds();
-  WiFiMulti.addAP("Bahnhof-2.4G-X9V3FV_RPT", "EC99ETRY");
-  WiFiMulti.addAP("Bahnhof-2.4G-X9V3FV", "EC99ETRY");
   Serial.begin(9600);
   delay(10);
   Serial.println("\n\n\n\n");
-  
+
+  for (unsigned char i = 0; i < sizeof(wifiCredentials) / sizeof(wifiCredentials[0]); i+=2) {
+     WiFiMulti.addAP(wifiCredentials[i], wifiCredentials[i+1]);
+  }
+
   verifyWifi();
   
   LedControl::SetBlue(true);
@@ -120,6 +117,11 @@ void setup() {
   
   attachInterrupt(digitalPinToInterrupt(powerReporter.GetTickPin()), handleInterrupt, FALLING);
   
+   if (!MDNS.begin("garagethingy")) {             // Start the mDNS responder for esp8266.local
+    Serial.println("Error setting up MDNS responder!");
+  }
+  Serial.println("mDNS responder started");
+  ArduinoOTA.begin();
   LedControl::SetGreen(true);
 }
 
@@ -140,7 +142,8 @@ void handleDoorReporter() {
   long t = (millis() - doorReportLastSend) / 1000;
   if (t >= 10) {
     Serial.println("Sending door report");
-    doorReporter.Report();
+    bool state = doorReporter.Report();
+    LedControl::SetRed(!state);
     doorReportLastSend = millis();
   }
 
@@ -155,4 +158,7 @@ void loop() {
   handleDoorReporter();
   handlePowerReporter();
   powerReporter.Report();
+
+  MDNS.update();
+  ArduinoOTA.handle();
 }

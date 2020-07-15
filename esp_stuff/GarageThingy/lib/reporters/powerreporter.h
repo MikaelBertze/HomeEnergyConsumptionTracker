@@ -5,7 +5,7 @@ class PowerReporter : public MqttReporter {
     public:
         //TempReporter(byte pin, mqttConfig mqtt_config, WiFiClient* espClient) 
         PowerReporter(byte pin, String id,  mqttConfig mqtt_config) 
-          : MqttReporter(mqtt_config), pin_(pin) 
+          : MqttReporter(mqtt_config), pin_(pin), id_(id) 
         {
           
         }
@@ -16,7 +16,7 @@ class PowerReporter : public MqttReporter {
 
         void Report() {
           if (currentTickPeriod != lastSentTickPeriod) {
-            report("{ \"id\" : \"" + id_ + "\", \"power_tick_period\" : \"" + currentTickPeriod + "}");
+            report("{ \"id\" : \"" + id_ + "\", \"power_tick_period\" : " + currentTickPeriod + " }");
             lastSentTickPeriod = currentTickPeriod;
           }
         }

@@ -5,14 +5,15 @@ class DoorReporter : public MqttReporter {
     public:
         //TempReporter(byte pin, mqttConfig mqtt_config, WiFiClient* espClient) 
         DoorReporter(byte pin, String id,  mqttConfig mqtt_config) 
-          : MqttReporter(mqtt_config), pin_(pin) 
+          : MqttReporter(mqtt_config), pin_(pin), id_(id) 
         { 
           pinMode(pin_, INPUT);           
         }
 
-        void Report() {
+        bool Report() {
           bool state = digitalRead(pin_);
-          report("{ \"id\" : \"" + id_ + "\", \"door\" : \"" + (state ? "true" : "false") + "}");
+          report("{ \"id\" : \"" + id_ + "\", \"door\" : " + (state ? "true" : "false") + "}");
+          return state;
         }
 
     private:

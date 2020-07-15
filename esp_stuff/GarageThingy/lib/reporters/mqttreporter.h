@@ -5,7 +5,7 @@
 #include <PubSubClient.h>
 #include <ESP8266WiFi.h>
 
-#define MSG_BUFFER_SIZE 50
+#define MSG_BUFFER_SIZE 100
 
   struct mqttConfig {
       const char* broker;
