@@ -56,7 +56,6 @@ void handleInterrupt() {
 
 void verifyWifi() {
 
-  uint32_t test = 15000;
   if (WiFiMulti.run() == WL_CONNECTED)
     return;
   
@@ -150,6 +149,7 @@ void handleDoorReporter() {
 }
 void handlePowerReporter() {
   powerReporter.reconnectingLoop();
+  powerReporter.Report();
 }
 
 void loop() {
@@ -157,8 +157,6 @@ void loop() {
   handleTempReporter();  
   handleDoorReporter();
   handlePowerReporter();
-  powerReporter.Report();
-
   MDNS.update();
   ArduinoOTA.handle();
 }
