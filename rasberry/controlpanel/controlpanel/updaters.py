@@ -66,7 +66,7 @@ class PowerUpdater(MqttUpdater):
 
     def restart_watchdog(self):
         self.watchdog.cancel()
-        self.watchdog = Timer(10.0, self.timeout)
+        self.watchdog = Timer(15.0, self.timeout)
         self.watchdog.start()
 
     @staticmethod
