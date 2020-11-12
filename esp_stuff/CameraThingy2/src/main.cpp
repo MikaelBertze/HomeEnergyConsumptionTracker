@@ -30,8 +30,8 @@ extern "C" {
 
 #include "camera_pins.h"
 
-const char* ssid = "Alla mina kompisar";
-const char* password = "BlixtenMaskin";
+const char* ssid = ".........";
+const char* password = "........";
 WebServer server(80);
 double last_deg = 0;
 long lastTick = millis();
