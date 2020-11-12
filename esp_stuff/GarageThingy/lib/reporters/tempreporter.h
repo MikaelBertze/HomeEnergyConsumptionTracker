@@ -13,7 +13,7 @@ class TempReporter : public MqttReporter {
 
         void Report() {
           tempSensor_.requestTemperatures();
-          float temp = tempSensor_.getTempCByIndex(0) * .88;
+          float temp = tempSensor_.getTempCByIndex(0);
           report("{ \"id\" : \"" + id_ + "\", \"temp\" : \"" + String(temp,1) + "\"}");
         }
 
