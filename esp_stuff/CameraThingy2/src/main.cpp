@@ -8,6 +8,7 @@ extern "C" {
 #include "math.h"
 //#include <PubSubClient.h>
 #include <mqttreporter.h>
+#include "wifi-credentials.h"
 
 }
 #define LED_BUILTIN 4
@@ -30,12 +31,18 @@ extern "C" {
 
 #include "camera_pins.h"
 
-const char* ssid = ".........";
-const char* password = "........";
+
+/** Report struct */
+typedef struct {
+	int angle;
+  int timespan_ms;
+  bool handled;
+} angle_report_t;
+
+angle_report_t angle_report;
+
 WebServer server(80);
-double last_deg = 0;
-long lastTick = millis();
-bool running = true;
+bool running = false;
 const char* mqtt_server = "bulbasaur.bertze.se";
 const char* topic = "hallondisp_test";
 
@@ -45,11 +52,15 @@ MqttReporter reporter({ mqtt_server, topic, "water_meter" });
 //WiFiClient espClient;
 //PubSubClient client(espClient);
 
+int latestAngle = 0;
+
+TaskHandle_t Task1;
 
 void handleRoot();
 void handleStop();
 void handleStart();
-void run();
+void handleStatus();
+void run(void * params);
 
 void setup() {
   Serial.begin(115200);
@@ -121,7 +132,7 @@ void setup() {
   s->set_hmirror(s, 1);
 #endif
   WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
+  WiFi.begin(SSID, password);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -178,6 +189,7 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/stop", handleStop);
   server.on("/start", handleStart);
+  server.on("/status", handleStatus);
   server.begin();
   Serial.println("HTTP server started");
 }
@@ -192,11 +204,19 @@ void loop() {
   // put your main code here, to run repeatedly:
   ArduinoOTA.handle();
   server.handleClient();
-  
-  if (running)
-  {
-    run();
+  if(running) {
+    if (!angle_report.handled) {
+      int a = angle_report.angle;
+      angle_report.handled = true;
+      String s = String("{ \"angle\" : \"[angle]\"}");
+      s.replace("[angle]", String(a, DEC));
+      reporter.report(s);
+    }
   }
+  // if (running)
+  // {
+  //   run();
+  // }
 }
 
 dl_matrix3du_t * get_image(){
@@ -299,34 +319,60 @@ int get_meter_angle(dl_matrix3du_t *s_matrix) {
 void handleStart() {
   running = true;
   reporter.report("Starting reporting");
+  xTaskCreatePinnedToCore(
+      run, /* Function to implement the task */
+      "Task1", /* Name of the task */
+      10000,  /* Stack size in words */
+      (void*)&angle_report,  /* Task input parameter */
+      1,  /* Priority of the task */
+      &Task1,  /* Task handle. */
+      1); /* Core where the task should run */
+  
+  WiFiClient web_client = server.client();
+  web_client.print("HTTP/1.1 200 OK\r\n");
 }
+
+void handleStatus() {
+  WiFiClient web_client = server.client();
+  web_client.print("HTTP/1.1 200 OK\r\n");
+  web_client.printf("ANGLE: %d\r\n", angle_report.angle);
+  web_client.printf("MS: %d\r\n", angle_report.timespan_ms);
+  web_client.printf("HANDLED: %s\r\n", angle_report.handled ? "YES" : "NO");
+  
+}
+
 void handleStop() {
   running = false;
   reporter.report("Stopping reporting");
+  vTaskDelete(Task1);
+
+  WiFiClient web_client = server.client();
+  web_client.print("HTTP/1.1 200 OK\r\n");
+
 }
 void handleRoot() {
   Serial.println("HandleRoot");
-  int loop_time = millis();
-  int time_diff = loop_time - lastTick;
+  //int loop_time = millis();
+  //int time_diff = loop_time - lastTick;
   dl_matrix3du_t *s_matrix = get_image();
   int angle = get_meter_angle(s_matrix);
 
-  int original_angle = angle;
-  if (angle < last_deg && angle < 170 && last_deg > 190)  // handle passing 0 deg
-    angle += 360;
+  // int original_angle = angle;
+  // if (angle < last_deg && angle < 170 && last_deg > 190)  // handle passing 0 deg
+  //   angle += 360;
   
 
-  double deg_diff = angle -  last_deg;
-  double consumtion = 0;
-  double l_diff = 0;
-  if (deg_diff > 0) {
-    lastTick = loop_time;
-    last_deg = original_angle;
+  // double deg_diff = angle -  last_deg;
+  // double consumtion = 0;
+  // double l_diff = 0;
+  // if (deg_diff > 0) {
+  //   lastTick = loop_time;
+  //   last_deg = original_angle;
     
-    consumtion = (double)l_diff / (time_diff / 1000);
-    double deg_per_l = 420; 
-    l_diff = deg_diff/deg_per_l;
-  }
+  //   consumtion = (double)l_diff / (time_diff / 1000);
+  //   double deg_per_l = 420; 
+  //   l_diff = deg_diff/deg_per_l;
+  // }
 
   int len = s_matrix->h * s_matrix->w; // * image_matrix->c;
   
@@ -337,10 +383,10 @@ void handleRoot() {
   web_client.printf("Content-Length: %d\r\n", len);
   web_client.print("Connection: close\r\n");
   web_client.print("Access-Control-Allow-Origin: *\r\n");
-  web_client.printf("ANGLE: %d\r\n", original_angle);
-  web_client.printf("LITERS: %.4f\r\n", l_diff);
-  web_client.printf("CONSUMPTION: %.2f\r\n", consumtion);
-  web_client.printf("T_DIFF: %d\r\n", time_diff);
+  web_client.printf("ANGLE: %d\r\n", angle);
+  //web_client.printf("LITERS: %.4f\r\n", l_diff);
+  //web_client.printf("CONSUMPTION: %.2f\r\n", consumtion);
+  //web_client.printf("T_DIFF: %d\r\n", time_diff);
   web_client.print("\r\n");
   //client.write((const char*)image_matrix->item, len);
   web_client.write((const char*)s_matrix->item, len);
@@ -351,31 +397,54 @@ void handleRoot() {
   reporter.report("hej");
 }
 
-void run() {
-  int loop_time = millis();
-  int time_diff = loop_time - lastTick;
-  dl_matrix3du_t *s_matrix = get_image();
-  int angle = get_meter_angle(s_matrix);
-
-  int original_angle = angle;
-  if (angle < last_deg && angle < 170 && last_deg > 190)  // handle passing 0 deg
-    angle += 360;
-  
-
-  double deg_diff = angle -  last_deg;
-  double consumtion = 0;
-  double l_diff = 0;
-  if (deg_diff > 0) {
-    lastTick = loop_time;
-    last_deg = original_angle;
+void run( void * params ) {
+  double last_deg = 0;
+  long lastTick = millis();
+  angle_report_t* a = (angle_report_t *) params;
+  int i = 0;
+  for(;;) {
     
-    consumtion = (double)l_diff / (time_diff / 1000);
-    double deg_per_l = 420; 
-    l_diff = deg_diff/deg_per_l;
-    String a = "{ \"water_angle\" : " + original_angle;
-    a += "}";
+    //delay(1000);
+    //continue;
+    //*a = i++;
+    //latestAngle =  latestAngle++; // original_angle;
+    //delay(1);
+    //continue;
+
+    // int loop_time = millis();
+    // int time_diff = loop_time - lastTick;
+    dl_matrix3du_t *s_matrix = get_image();
+    int angle = get_meter_angle(s_matrix);
+    dl_matrix3du_free(s_matrix);
+
+    a->angle=angle;
+    a->timespan_ms=millis();
+    a->handled = false;
+
+    // int original_angle = angle;
+    // if (angle < last_deg && angle < 170 && last_deg > 190)  // handle passing 0 deg
+    //   angle += 360;
     
-    reporter.report(a);
+    // //latestAngle = original_angle;
+    // continue;
+
+
+    // double deg_diff = angle -  last_deg;
+    // double consumtion = 0;
+    // double l_diff = 0;
+    // if (deg_diff > 0) {
+    //   lastTick = loop_time;
+    //   last_deg = original_angle;
+      
+    //   consumtion = (double)l_diff / (time_diff / 1000);
+    //   double deg_per_l = 420; 
+    //   l_diff = deg_diff/deg_per_l;
+    //   String a = "{ \"water_angle\" : " + original_angle;
+    //   a += "}";
+      
+      //reporter.report(a);
+      //delay(100);
+    // }
   }
 
 }
